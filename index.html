@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exámenes - Entorno Estratégico de TI</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --border: #334155;
+      --good-bg: rgba(34, 197, 94, 0.12);
+      --bad-bg: rgba(248, 113, 113, 0.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #0b1020 0%, #0f172a 35%, #111827 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .hero {
+      background: linear-gradient(135deg, rgba(56,189,248,.11), rgba(34,197,94,.07));
+      border: 1px solid rgba(56,189,248,.18);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.22);
+    }
+    h1 { margin: 0 0 14px; font-size: 2rem; }
+    h2 { margin: 0 0 12px; font-size: 1.2rem; }
+    p { margin: 0 0 10px; }
+    .topics-box {
+      background: rgba(15, 23, 42, .62);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .topics-box ul {
+      margin: 0;
+      padding-left: 18px;
+      columns: 2;
+      column-gap: 28px;
+    }
+    .topics-box li {
+      break-inside: avoid;
+      margin-bottom: 8px;
+    }
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+    .tab-btn, .action-btn {
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      padding: 12px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: .2s ease;
+      font-weight: bold;
+    }
+    .tab-btn:hover, .action-btn:hover { transform: translateY(-1px); }
+    .tab-btn.active {
+      background: rgba(56,189,248,.14);
+      border-color: rgba(56,189,248,.45);
+      color: #dff6ff;
+    }
+    .exam-panel {
+      display: none;
+      background: rgba(11,18,32,.74);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 22px;
+    }
+    .exam-panel.active { display: block; }
+    .exam-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: .9rem;
+      font-weight: bold;
+      border: 1px solid var(--border);
+      background: rgba(148,163,184,.08);
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .score-box {
+      min-width: 240px;
+      background: rgba(2,6,23,.46);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .big-score {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #fff;
+    }
+    .question {
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.78);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .question.correct {
+      border-color: rgba(34,197,94,.55);
+      background: var(--good-bg);
+    }
+    .question.incorrect {
+      border-color: rgba(248,113,113,.55);
+      background: var(--bad-bg);
+    }
+    .q-title {
+      font-weight: bold;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+    }
+    .options {
+      display: grid;
+      gap: 10px;
+    }
+    label.option {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: rgba(255,255,255,.02);
+      cursor: pointer;
+    }
+    label.option:hover { border-color: rgba(56,189,248,.45); }
+    input[type="radio"] { margin-right: 10px; }
+    .feedback {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(2,6,23,.45);
+    }
+    .feedback.show { display: block; }
+    .feedback strong { color: #fff; }
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .action-btn.primary {
+      background: rgba(56,189,248,.14);
+      border-color: rgba(56,189,248,.45);
+    }
+    .action-btn.success {
+      background: rgba(34,197,94,.14);
+      border-color: rgba(34,197,94,.45);
+    }
+    .meta-line {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-top: 4px;
+    }
+    .footer-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    @media (max-width: 900px) {
+      .topics-box ul { columns: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Exámenes de estudio: Entorno Estratégico de TI</h1>
+      <div class="topics-box">
+        <h2>Temas del examen</h2>
+        <ul>
+          <li>Fundamentos de la planeación estratégica orientada a las tecnologías de información</li><li>Las TI en la organización</li><li>Planeación: generalidades y alcance</li><li>Planeación estratégica, táctica y operativa</li><li>Planeación estratégica: concepto, antecedentes e importancia del pensamiento estratégico en TI</li><li>Proceso de planeación estratégica: análisis, formulación, implementación y evaluación</li><li>Jerarquía de objetivos: propósito, visión, misión, objetivos, valores y políticas</li><li>Organización vista como sistema</li><li>Estructura organizacional y descripción de puestos</li><li>Cadena de valor, cadena de valor de servicio y cadena de valor virtual</li><li>Procedimientos estratégicos</li><li>Descripción del producto: bien, servicio y experiencia</li><li>Información financiera</li><li>Análisis externo e interno</li><li>Determinación de líneas de acción</li><li>Diseño, implementación y evaluación de estrategias</li><li>Herramientas de diagnóstico: Método Delphi, FODA cualitativo, FODA cuantitativo, Ishikawa, Pareto y 5 fuerzas de Porter</li><li>Ejemplo aplicado a empresa de software: requerimientos, desarrollo, deployment y soporte</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="tabs" id="tabs"></div>
+    <div id="examContainer"></div>
+
+    <p class="footer-note">Hay 6 exámenes: 3 de conceptos y 3 de casos. Cada uno trae 10 preguntas. Las opciones se mezclan al cargar para que la correcta no quede siempre en el mismo lugar.</p>
+  </div>
+
+  <script>
+    const sourceExams = [{"id": "concepto-facil", "title": "Conceptos · Fácil", "subtitle": "Definiciones básicas para fijar la base del tema.", "badges": ["Conceptos", "Básico", "Verdadero/Falso"], "questions": [{"prompt": "Las TI pueden aportar valor estratégico al negocio, no solo soporte técnico.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. En este curso, TI se entiende como un habilitador del negocio y de la estrategia."}, {"prompt": "La planeación consiste únicamente en reaccionar cuando ya apareció el problema.", "options": [{"text": "Verdadero", "correct": false}, {"text": "Falso", "correct": true}], "explanation": "Correcto. Planear implica anticipar, definir objetivos y decidir acciones antes de actuar."}, {"prompt": "La planeación táctica traduce la estrategia a planes por áreas o departamentos.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. La táctica baja la estrategia al nivel funcional."}, {"prompt": "La planeación operativa se enfoca en tareas concretas, responsables y tiempos específicos.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. Es el nivel más cercano a la ejecución diaria."}, {"prompt": "La visión describe la imagen futura deseada de la organización.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. La visión responde hacia dónde quiere llegar la organización."}, {"prompt": "La misión expresa el propósito fundamental y la razón de ser de la organización.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. La misión dice por qué existe la organización y qué aporta."}, {"prompt": "Las políticas son lineamientos generales que orientan decisiones repetidas.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. Las políticas guían la forma de actuar en situaciones recurrentes."}, {"prompt": "El análisis externo identifica fortalezas y debilidades internas.", "options": [{"text": "Verdadero", "correct": false}, {"text": "Falso", "correct": true}], "explanation": "Correcto. El análisis externo revisa oportunidades y amenazas; fortalezas y debilidades son del análisis interno."}, {"prompt": "El método Delphi se basa en consultas iterativas y anónimas a expertos.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. Su meta es acercar opiniones hasta lograr consenso."}, {"prompt": "El FODA cuantitativo asigna pesos e impactos numéricos a cada factor.", "options": [{"text": "Verdadero", "correct": true}, {"text": "Falso", "correct": false}], "explanation": "Correcto. Eso permite priorizar factores con base en puntajes ponderados."}]}, {"id": "concepto-medio", "title": "Conceptos · Medio", "subtitle": "Distingue conceptos parecidos sin caer en trampas.", "badges": ["Conceptos", "Intermedio", "Opción múltiple"], "questions": [{"prompt": "¿Qué opción relaciona correctamente los niveles de planeación?", "options": [{"text": "Estratégica = rumbo general; táctica = planes por áreas; operativa = ejecución cotidiana", "correct": true}, {"text": "Estratégica = tareas diarias; táctica = visión futura; operativa = políticas generales", "correct": false}, {"text": "Estratégica = solo finanzas; táctica = solo TI; operativa = solo recursos humanos", "correct": false}, {"text": "Estratégica = reacción inmediata; táctica = improvisación; operativa = intuición", "correct": false}], "explanation": "La estratégica marca el rumbo, la táctica organiza a las áreas y la operativa convierte eso en acciones concretas."}, {"prompt": "¿Qué opción distingue mejor entre objetivo general y objetivo específico?", "options": [{"text": "El general marca el resultado amplio; el específico desglosa partes concretas para lograrlo", "correct": true}, {"text": "El general siempre lleva fecha exacta; el específico nunca puede medirse", "correct": false}, {"text": "El general es para empleados; el específico solo sirve para clientes", "correct": false}, {"text": "El general sustituye a la misión; el específico sustituye a la visión", "correct": false}], "explanation": "El objetivo general es amplio; los específicos detallan componentes o pasos del logro."}, {"prompt": "¿Qué describe mejor a la organización vista como sistema?", "options": [{"text": "Conjunto de áreas independientes que trabajan sin afectarse entre sí", "correct": false}, {"text": "Conjunto de elementos interrelacionados con entradas, procesos, salidas y retroalimentación", "correct": true}, {"text": "Lista de puestos ordenados por salario y antigüedad", "correct": false}, {"text": "Esquema donde solo importa la autoridad del director general", "correct": false}], "explanation": "La idea de sistema resalta interdependencia, transformación y retroalimentación."}, {"prompt": "¿Qué describe mejor la diferencia entre estructura organizacional y descripción de puestos?", "options": [{"text": "La estructura muestra áreas y jerarquías; la descripción de puestos detalla funciones y responsabilidades del cargo", "correct": true}, {"text": "La estructura enumera salarios; la descripción de puestos define la misión institucional", "correct": false}, {"text": "La estructura solo sirve en fábricas; la descripción solo sirve en servicios", "correct": false}, {"text": "La estructura y la descripción de puestos son exactamente lo mismo", "correct": false}], "explanation": "Una cosa es cómo se organiza la empresa; otra, qué hace cada puesto."}, {"prompt": "¿Qué caracteriza mejor a la cadena de valor de servicio?", "options": [{"text": "Se centra en materia prima, inventario físico y embarques industriales", "correct": false}, {"text": "Se centra en atención, respuesta, experiencia y relación con el cliente durante el servicio", "correct": true}, {"text": "Elimina actividades de apoyo para reducir costos administrativos", "correct": false}, {"text": "Solo puede aplicarse cuando hay un producto tangible", "correct": false}], "explanation": "En servicios, la percepción del cliente y la experiencia forman parte central del valor."}, {"prompt": "¿Qué caracteriza mejor a la cadena de valor virtual?", "options": [{"text": "La creación de valor a partir de datos, información y procesos digitales", "correct": true}, {"text": "La compra de maquinaria para aumentar la producción física", "correct": false}, {"text": "La reducción del servicio al cliente para automatizar todo", "correct": false}, {"text": "La eliminación de decisiones humanas en la organización", "correct": false}], "explanation": "La cadena virtual se apoya en plataformas, datos, analítica y flujos digitales."}, {"prompt": "¿Qué herramienta sirve mejor para buscar causas raíz agrupándolas por categorías?", "options": [{"text": "Diagrama de Ishikawa", "correct": true}, {"text": "Método Delphi", "correct": false}, {"text": "FODA cualitativo", "correct": false}, {"text": "Diagrama de Pareto", "correct": false}], "explanation": "Ishikawa organiza posibles causas para entender por qué ocurre un problema."}, {"prompt": "¿Qué idea representa mejor el diagrama de Pareto?", "options": [{"text": "Todos los problemas pesan lo mismo si se observan por separado", "correct": false}, {"text": "Un pequeño grupo de causas suele explicar gran parte del efecto", "correct": true}, {"text": "Los expertos siempre deben responder de forma anónima", "correct": false}, {"text": "Las amenazas son más importantes que las fortalezas por definición", "correct": false}], "explanation": "Pareto ayuda a priorizar las pocas causas vitales que generan gran parte del problema."}, {"prompt": "¿Cuál opción sí corresponde a una fuerza competitiva de Porter?", "options": [{"text": "Poder de negociación de los proveedores", "correct": true}, {"text": "Capacidad de memoria de los servidores internos", "correct": false}, {"text": "Velocidad promedio del Wi‑Fi corporativo", "correct": false}, {"text": "Cantidad de organigramas por departamento", "correct": false}], "explanation": "Las 5 fuerzas incluyen rivalidad, entrantes, sustitutos, clientes y proveedores."}, {"prompt": "¿Para qué sirve principalmente la información financiera en la planeación estratégica?", "options": [{"text": "Para evaluar viabilidad, costos, rentabilidad y prioridad de inversiones", "correct": true}, {"text": "Para reemplazar el análisis externo y tomar decisiones sin contexto", "correct": false}, {"text": "Para describir puestos sin revisar competencias del personal", "correct": false}, {"text": "Para definir la misión institucional sin hablar del negocio", "correct": false}], "explanation": "La estrategia también depende de presupuesto, retorno esperado y capacidad financiera."}]}, {"id": "concepto-dificil", "title": "Conceptos · Difícil", "subtitle": "Conceptos más finos y diferencias que suelen confundir.", "badges": ["Conceptos", "Difícil", "Comparación fina"], "questions": [{"prompt": "¿Qué explica mejor los antecedentes de la planeación estratégica?", "options": [{"text": "Surge de la necesidad de anticipar escenarios y coordinar decisiones de largo plazo en entornos complejos", "correct": true}, {"text": "Nace como una técnica exclusiva para hacer organigramas y manuales de puestos", "correct": false}, {"text": "Se creó solo para reemplazar por completo la administración operativa diaria", "correct": false}, {"text": "Aparece únicamente con las redes sociales y el marketing digital moderno", "correct": false}], "explanation": "La planeación estratégica tiene raíces en el pensamiento militar y administrativo orientado al largo plazo."}, {"prompt": "¿Por qué es importante el pensamiento estratégico en TI?", "options": [{"text": "Porque ayuda a alinear tecnología, negocio, prioridades e inversión con impacto organizacional", "correct": true}, {"text": "Porque permite comprar tecnología nueva aunque no exista una necesidad clara", "correct": false}, {"text": "Porque evita que TI se relacione con otras áreas y así trabaje con mayor autonomía", "correct": false}, {"text": "Porque sustituye por completo la necesidad de medir resultados y riesgos", "correct": false}], "explanation": "Pensar estratégicamente en TI significa conectar decisiones tecnológicas con valor de negocio."}, {"prompt": "¿Qué distingue mejor al propósito frente a la misión?", "options": [{"text": "El propósito expresa el sentido esencial de existir; la misión lo aterriza en lo que la organización hace y aporta", "correct": true}, {"text": "El propósito siempre es numérico; la misión siempre es emocional", "correct": false}, {"text": "El propósito sustituye a la visión; la misión sustituye a las políticas", "correct": false}, {"text": "El propósito solo se usa en empresas públicas y la misión solo en privadas", "correct": false}], "explanation": "Son cercanos, pero el propósito es más profundo y la misión más operativa sobre la razón de ser."}, {"prompt": "¿Qué diferencia mejor una política de un procedimiento estratégico?", "options": [{"text": "La política orienta decisiones generales; el procedimiento define pasos ordenados para actuar", "correct": true}, {"text": "La política fija tareas por hora; el procedimiento expresa la visión futura", "correct": false}, {"text": "La política es un indicador financiero; el procedimiento es una amenaza externa", "correct": false}, {"text": "La política y el procedimiento tienen exactamente el mismo alcance", "correct": false}], "explanation": "La política dice cómo orientar la acción; el procedimiento muestra cómo ejecutarla paso a paso."}, {"prompt": "¿Qué describe mejor una línea de acción?", "options": [{"text": "Un rumbo concreto derivado del diagnóstico que guía iniciativas para acercarse a los objetivos", "correct": true}, {"text": "Una opinión aislada sin responsables, recursos ni relación con la estrategia", "correct": false}, {"text": "Un problema detectado que todavía no se traduce a respuesta organizacional", "correct": false}, {"text": "Una meta redactada sin conexión con hallazgos internos o externos", "correct": false}], "explanation": "La línea de acción conecta lo diagnosticado con lo que se va a hacer."}, {"prompt": "¿Qué secuencia representa mejor diseño, implementación y evaluación de estrategias?", "options": [{"text": "Definir la estrategia, ejecutarla y después medir resultados para ajustar", "correct": true}, {"text": "Medir resultados, ejecutar al azar y después decidir la estrategia", "correct": false}, {"text": "Ejecutar primero, diagnosticar después y por último pensar objetivos", "correct": false}, {"text": "Diseñar una vez y evitar cualquier evaluación para no cambiar el plan", "correct": false}], "explanation": "Primero se diseña, luego se implementa y al final se evalúa para corregir."}, {"prompt": "¿Qué opción distingue mejor bien, servicio y experiencia?", "options": [{"text": "Bien = tangible; servicio = prestación intangible; experiencia = vivencia integral percibida por el cliente", "correct": true}, {"text": "Bien = digital; servicio = físico; experiencia = inventario almacenado", "correct": false}, {"text": "Bien = misión; servicio = visión; experiencia = política", "correct": false}, {"text": "Bien y servicio son sinónimos, experiencia es solo publicidad", "correct": false}], "explanation": "La experiencia integra percepciones y emociones, no solo la entrega funcional."}, {"prompt": "¿Cuál opción clasifica correctamente actividades de la cadena de valor?", "options": [{"text": "Negociar licencias cloud = apoyo; desarrollar y probar software = primaria", "correct": true}, {"text": "Capacitar personal = primaria; monitorear soporte = apoyo", "correct": false}, {"text": "Marketing digital = apoyo; reclutamiento = primaria", "correct": false}, {"text": "Atención postventa = apoyo; compras de hardware = primaria", "correct": false}], "explanation": "Abastecimiento y RR.HH. son apoyo; operaciones y servicio al cliente son primarias."}, {"prompt": "¿Qué diferencia mejor al FODA cualitativo del cuantitativo?", "options": [{"text": "El cualitativo describe factores; el cuantitativo les asigna pesos e impactos para priorizarlos", "correct": true}, {"text": "El cualitativo solo revisa amenazas; el cuantitativo solo revisa fortalezas", "correct": false}, {"text": "El cualitativo elimina interpretación; el cuantitativo evita el uso de números", "correct": false}, {"text": "El cualitativo es externo y el cuantitativo es interno por definición", "correct": false}], "explanation": "La diferencia clave es narrativa frente a ponderación numérica."}, {"prompt": "¿Qué describe mejor los procedimientos estratégicos?", "options": [{"text": "Formas ordenadas de ejecutar acciones clave alineadas con la estrategia institucional", "correct": true}, {"text": "Listas de deseos sin relación con procesos, responsables ni secuencia", "correct": false}, {"text": "Herramientas exclusivas para evaluar la competencia en el mercado", "correct": false}, {"text": "Documentos financieros creados solo para auditoría contable", "correct": false}], "explanation": "Los procedimientos estratégicos buscan que la ejecución sea consistente con la estrategia."}]}, {"id": "casos-facil", "title": "Casos · Fácil", "subtitle": "Mini casos para clasificar correctamente lo más importante.", "badges": ["Casos", "Básico", "Aplicación directa"], "questions": [{"prompt": "Una empresa redacta: “Ser la plataforma educativa digital más confiable de Latinoamérica”. ¿Eso corresponde mejor a...?", "options": [{"text": "Visión", "correct": true}, {"text": "Misión", "correct": false}, {"text": "Política", "correct": false}, {"text": "Procedimiento", "correct": false}], "explanation": "Habla de una imagen futura deseada, así que corresponde a la visión."}, {"prompt": "Una organización declara: “Brindar soluciones tecnológicas que mejoren la operación de pequeñas empresas”. ¿Eso corresponde mejor a...?", "options": [{"text": "Objetivo específico", "correct": false}, {"text": "Misión", "correct": true}, {"text": "Meta SMART", "correct": false}, {"text": "Amenaza externa", "correct": false}], "explanation": "Describe la razón de ser y el aporte principal de la organización."}, {"prompt": "La dirección propone: “Aumentar la presencia en el mercado latinoamericano en 30%”. ¿Qué nivel representa mejor?", "options": [{"text": "Objetivo estratégico", "correct": true}, {"text": "Tarea operativa", "correct": false}, {"text": "Procedimiento de soporte", "correct": false}, {"text": "Descripción de puesto", "correct": false}], "explanation": "Es un gran resultado deseado de mediano o largo plazo."}, {"prompt": "Un equipo define: “Liberar la app en Brasil y Colombia durante los próximos 12 meses”. ¿Qué representa mejor?", "options": [{"text": "Meta SMART", "correct": true}, {"text": "Visión", "correct": false}, {"text": "Valor organizacional", "correct": false}, {"text": "Fuerza competitiva", "correct": false}], "explanation": "Es concreta, medible y con plazo definido."}, {"prompt": "Antes de entrar a otro país, la empresa revisa regulaciones, inflación, hábitos del consumidor y cambios tecnológicos. ¿Qué tipo de análisis está haciendo?", "options": [{"text": "Análisis externo", "correct": true}, {"text": "Análisis interno", "correct": false}, {"text": "Descripción de puestos", "correct": false}, {"text": "Evaluación de desempeño", "correct": false}], "explanation": "Está revisando factores del entorno, no recursos propios."}, {"prompt": "La organización detecta talento fuerte en cloud, pero también deuda técnica y procesos lentos. ¿Qué tipo de análisis está haciendo?", "options": [{"text": "Análisis interno", "correct": true}, {"text": "Análisis externo", "correct": false}, {"text": "Cadena de valor virtual", "correct": false}, {"text": "5 fuerzas de Porter", "correct": false}], "explanation": "Está revisando fortalezas y debilidades dentro de la organización."}, {"prompt": "En una empresa de software, entrevistas con el cliente, historias de usuario y backlog priorizado en Jira corresponden mejor a la etapa de...", "options": [{"text": "Requerimientos", "correct": true}, {"text": "Deployment", "correct": false}, {"text": "Soporte", "correct": false}, {"text": "Marketing", "correct": false}], "explanation": "Eso pertenece a la obtención y organización de necesidades del cliente."}, {"prompt": "Usar Jenkins, GitHub Actions, Docker y Kubernetes para pasar a staging o producción corresponde mejor a...", "options": [{"text": "Deployment", "correct": true}, {"text": "Requerimientos", "correct": false}, {"text": "Abastecimiento", "correct": false}, {"text": "Recursos humanos", "correct": false}], "explanation": "Ese conjunto de herramientas y acciones corresponde a la liberación del software."}, {"prompt": "Una clínica digital decide mejorar tiempos de respuesta, claridad en la atención y seguimiento del paciente. ¿Qué enfoque de cadena de valor encaja mejor?", "options": [{"text": "Cadena de valor de servicio", "correct": true}, {"text": "Cadena de valor industrial", "correct": false}, {"text": "Organigrama funcional", "correct": false}, {"text": "Diagrama de Pareto", "correct": false}], "explanation": "El valor aquí depende mucho de la experiencia y la interacción con el usuario."}, {"prompt": "Una empresa escribe para el puesto “Analista de soporte”: funciones, responsabilidades, horario, relación con otras áreas y requisitos técnicos. ¿Qué documento es?", "options": [{"text": "Descripción de puesto", "correct": true}, {"text": "Visión institucional", "correct": false}, {"text": "Análisis PESTEL", "correct": false}, {"text": "Política de compras", "correct": false}], "explanation": "Eso corresponde a una descripción de puesto."}]}, {"id": "casos-medio", "title": "Casos · Medio", "subtitle": "Selecciona la herramienta o nivel correcto cuando ya se parecen entre sí.", "badges": ["Casos", "Intermedio", "Herramientas y decisiones"], "questions": [{"prompt": "La empresa quiere decidir si adoptar IA en procesos internos. Para evitar que domine una sola voz, consulta a especialistas en rondas anónimas hasta acercar posturas. ¿Qué herramienta está usando?", "options": [{"text": "Método Delphi", "correct": true}, {"text": "Diagrama de Pareto", "correct": false}, {"text": "Cadena de valor virtual", "correct": false}, {"text": "Descripción de puestos", "correct": false}], "explanation": "La clave es la consulta anónima, iterativa y orientada al consenso."}, {"prompt": "Un equipo lista: fortalezas en cloud, debilidad por sistemas legacy, oportunidad en IA y amenaza por ciberataques, pero sin poner números. ¿Qué herramienta describe mejor ese trabajo?", "options": [{"text": "FODA cualitativo", "correct": true}, {"text": "FODA cuantitativo", "correct": false}, {"text": "PESTEL", "correct": false}, {"text": "Ishikawa", "correct": false}], "explanation": "Si solo se describen factores de forma narrativa, es FODA cualitativo."}, {"prompt": "La dirección quiere saber qué factor debe atender primero, así que asigna pesos e impactos a habilidades en cloud, deuda técnica, adopción de IA y competencia SaaS. ¿Qué herramienta está usando?", "options": [{"text": "FODA cuantitativo", "correct": true}, {"text": "Método Delphi", "correct": false}, {"text": "Análisis de puestos", "correct": false}, {"text": "Organización como sistema", "correct": false}], "explanation": "Los pesos e impactos convierten el diagnóstico en una priorización numérica."}, {"prompt": "Después de varias caídas del sistema, el equipo quiere ordenar posibles causas por personas, procesos, infraestructura y software antes de decidir. ¿Qué herramienta conviene más?", "options": [{"text": "Diagrama de Ishikawa", "correct": true}, {"text": "Diagrama de Pareto", "correct": false}, {"text": "Método Delphi", "correct": false}, {"text": "5 fuerzas de Porter", "correct": false}], "explanation": "Ishikawa sirve para abrir el mapa de causas raíz por categorías."}, {"prompt": "Una mesa de ayuda detecta 120 incidentes y observa que dos tipos de falla concentran casi todos los reportes. ¿Qué herramienta ayuda mejor a justificar esa priorización?", "options": [{"text": "Diagrama de Pareto", "correct": true}, {"text": "PESTEL", "correct": false}, {"text": "Método Delphi", "correct": false}, {"text": "Cadena de valor de servicio", "correct": false}], "explanation": "Pareto ayuda a mostrar cuáles pocas causas generan la mayor parte del problema."}, {"prompt": "Una plataforma de cursos enfrenta nuevos competidores, clientes que cambian fácil de proveedor y herramientas sustitutas gratuitas. ¿Qué análisis conviene para estudiar esa presión competitiva?", "options": [{"text": "5 fuerzas de Porter", "correct": true}, {"text": "Diagrama de Ishikawa", "correct": false}, {"text": "FODA cualitativo", "correct": false}, {"text": "Descripción de producto", "correct": false}], "explanation": "Ese caso trata de presión competitiva del sector, no de causas raíz internas."}, {"prompt": "La empresa tiene dos proyectos de TI valiosos, pero solo puede financiar uno. ¿Qué insumo ayuda más a decidir sin perder de vista sostenibilidad económica?", "options": [{"text": "Información financiera", "correct": true}, {"text": "Descripción de puestos", "correct": false}, {"text": "Organigrama institucional", "correct": false}, {"text": "Valor organizacional", "correct": false}], "explanation": "Costos, retorno, flujo y presupuesto condicionan la decisión estratégica."}, {"prompt": "Tras detectar baja presencia digital y buen talento técnico, la empresa decide abrir un canal de venta digital y reforzar automatización comercial. ¿Eso representa mejor una...?", "options": [{"text": "Línea de acción", "correct": true}, {"text": "Amenaza externa", "correct": false}, {"text": "Descripción de puesto", "correct": false}, {"text": "Fuerza competitiva", "correct": false}], "explanation": "Es un rumbo concreto derivado del diagnóstico para acercarse a los objetivos."}, {"prompt": "La dirección ya definió una estrategia de expansión. Ahora asigna responsables, recursos, calendario y seguimiento. ¿En qué parte del proceso está más claramente?", "options": [{"text": "Implementación", "correct": true}, {"text": "Análisis", "correct": false}, {"text": "Visión", "correct": false}, {"text": "Diagnóstico causal", "correct": false}], "explanation": "Asignar responsables y recursos corresponde a ejecutar la estrategia."}, {"prompt": "Se revisan indicadores, metas alcanzadas, desviaciones y necesidad de ajuste después de seis meses de ejecución. ¿Qué parte del proceso domina en ese momento?", "options": [{"text": "Evaluación de estrategias", "correct": true}, {"text": "Formulación de misión", "correct": false}, {"text": "Análisis de puestos", "correct": false}, {"text": "Aprovisionamiento", "correct": false}], "explanation": "Medir y corregir corresponde a la evaluación."}]}, {"id": "casos-dificil", "title": "Casos · Difícil", "subtitle": "Casos integrados con varias trampas razonables.", "badges": ["Casos", "Difícil", "Integración"], "questions": [{"prompt": "Una empresa detecta esta situación: oportunidad de crecer en mercados digitales, debilidad por deuda técnica, presión de competidores SaaS y presupuesto limitado. ¿Cuál respuesta estratégica está mejor construida?", "options": [{"text": "Priorizar una modernización gradual del sistema legado y enfocarla en mercados digitales con mayor retorno esperado", "correct": true}, {"text": "Comprar varias herramientas nuevas sin diagnóstico para mostrar innovación inmediata", "correct": false}, {"text": "Esperar a que la competencia disminuya antes de revisar cualquier cambio interno", "correct": false}, {"text": "Sustituir toda la estrategia por una campaña aislada en redes sociales", "correct": false}], "explanation": "La mejor opción conecta diagnóstico interno, entorno competitivo y restricción financiera."}, {"prompt": "Después de varias liberaciones fallidas, el área directiva quiere primero entender categorías de causas y luego demostrar cuáles causas concentran la mayoría de incidentes. ¿Qué combinación de herramientas encaja mejor?", "options": [{"text": "Ishikawa y después Pareto", "correct": true}, {"text": "Pareto y después Delphi", "correct": false}, {"text": "PESTEL y después FODA cualitativo", "correct": false}, {"text": "Porter y después organigrama", "correct": false}], "explanation": "Primero exploras causas raíz; luego priorizas cuáles pegan más."}, {"prompt": "Una universidad quiere lanzar una app para consultar aulas disponibles. El equipo hace entrevistas, arma historias de usuario, programa en sprints, usa CI/CD y luego monitorea incidentes. ¿Qué secuencia describe mejor el flujo?", "options": [{"text": "Requerimientos, desarrollo, deployment y soporte", "correct": true}, {"text": "Soporte, ventas, compras y evaluación", "correct": false}, {"text": "Misión, visión, políticas y valores", "correct": false}, {"text": "PESTEL, Porter, Ishikawa y Pareto", "correct": false}], "explanation": "Ese caso reproduce el flujo típico de una empresa de software."}, {"prompt": "Una empresa de streaming mejora recomendaciones con analítica, personaliza ofertas y toma decisiones en tiempo real con datos de uso. ¿Qué tipo de cadena de valor se vuelve más relevante?", "options": [{"text": "Cadena de valor virtual", "correct": true}, {"text": "Cadena de valor centrada en inventario físico", "correct": false}, {"text": "Cadena de valor exclusiva de abastecimiento", "correct": false}, {"text": "Cadena de valor limitada a logística externa", "correct": false}], "explanation": "Aquí el valor se genera fuertemente mediante datos, información y procesos digitales."}, {"prompt": "Un hospital digital descubre que el sistema funciona bien técnicamente, pero los pacientes abandonan porque la atención es lenta, fría y confusa. ¿Qué enfoque ayudaría más a entender dónde se pierde valor?", "options": [{"text": "Cadena de valor de servicio", "correct": true}, {"text": "Descripción de puesto aislada", "correct": false}, {"text": "Solo análisis financiero", "correct": false}, {"text": "Solo aprovisionamiento tecnológico", "correct": false}], "explanation": "El problema principal está en la experiencia y relación durante el servicio."}, {"prompt": "En una compañía, marketing promete entregas inmediatas, operaciones no puede cumplirlas y soporte recibe la molestia del cliente. ¿Qué idea explica mejor el problema?", "options": [{"text": "La organización funciona como sistema y una falla en un área afecta a las demás", "correct": true}, {"text": "Cada área puede evaluarse por separado porque no comparte resultados", "correct": false}, {"text": "El problema solo depende del puesto del director general", "correct": false}, {"text": "La solución es rehacer la visión sin revisar procesos ni coordinación", "correct": false}], "explanation": "Es un caso clásico de interdependencia sistémica."}, {"prompt": "La organización negocia contratos cloud y SLAs para asegurar continuidad. Al mismo tiempo, el equipo de ingeniería desarrolla y prueba nuevas funciones. ¿Cuál clasificación es correcta?", "options": [{"text": "Negociar SLAs = actividad de apoyo; desarrollar funciones = actividad primaria", "correct": true}, {"text": "Negociar SLAs = actividad primaria; desarrollar funciones = actividad de apoyo", "correct": false}, {"text": "Ambas son actividades de apoyo porque usan tecnología", "correct": false}, {"text": "Ambas son actividades primarias porque generan costos directos", "correct": false}], "explanation": "Abastecimiento es apoyo; operaciones y desarrollo forman parte primaria del valor."}, {"prompt": "Una firma quiere entrar a un nuevo mercado, pero antes necesita valorar regulaciones, intensidad competitiva y recursos propios. ¿Qué enfoque es más completo para empezar?", "options": [{"text": "Combinar análisis externo, análisis interno y diagnóstico competitivo", "correct": true}, {"text": "Elegir una sola herramienta y omitir el resto para no complicar el estudio", "correct": false}, {"text": "Redactar primero el organigrama y asumir que con eso basta", "correct": false}, {"text": "Pasar directo a implementación para ahorrar tiempo de análisis", "correct": false}], "explanation": "La decisión necesita una visión integral del entorno, de la empresa y de la competencia."}, {"prompt": "El director propone esta secuencia: revisar entorno y recursos, decidir líneas de acción, ejecutar proyectos y medir resultados. ¿Qué opción la nombra correctamente?", "options": [{"text": "Análisis, formulación, implementación y evaluación", "correct": true}, {"text": "Misión, visión, políticas y valores", "correct": false}, {"text": "Ishikawa, Pareto, Delphi y Porter", "correct": false}, {"text": "Abastecimiento, operaciones, ventas y servicio", "correct": false}], "explanation": "Esa es la secuencia clásica del proceso de planeación estratégica."}, {"prompt": "Una empresa define: visión de liderazgo digital, misión de proveer soluciones confiables, objetivo de crecer 25% y política de seguridad obligatoria en todos los proyectos. ¿Qué afirmación clasifica mejor esos elementos?", "options": [{"text": "La visión marca el futuro, la misión explica la razón de ser, el objetivo fija un resultado y la política orienta decisiones repetidas", "correct": true}, {"text": "La visión fija tareas diarias, la misión mide KPIs, el objetivo reemplaza la política y la política sustituye la estrategia", "correct": false}, {"text": "La visión y la misión son metas SMART, el objetivo es una fuerza de Porter y la política es una amenaza", "correct": false}, {"text": "La visión solo aplica a marketing, la misión solo a finanzas, el objetivo solo a TI y la política solo a RH", "correct": false}], "explanation": "Cada elemento pertenece a un nivel distinto de la jerarquía y cumple una función diferente."}]}];
+
+    function deepCopy(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildExamState() {
+      return sourceExams.map(exam => {
+        const copied = deepCopy(exam);
+        copied.questions = copied.questions.map(q => ({
+          ...q,
+          options: shuffle(q.options)
+        }));
+        return copied;
+      });
+    }
+
+    let exams = buildExamState();
+
+    const tabs = document.getElementById('tabs');
+    const examContainer = document.getElementById('examContainer');
+
+    function renderTabs() {
+      tabs.innerHTML = exams.map((exam, index) => `
+        <button class="tab-btn ${index === 0 ? 'active' : ''}" data-target="${exam.id}">
+          ${exam.title}
+        </button>
+      `).join('');
+    }
+
+    function renderExams() {
+      examContainer.innerHTML = exams.map((exam, examIndex) => `
+        <section class="exam-panel ${examIndex === 0 ? 'active' : ''}" id="${exam.id}">
+          <div class="exam-head">
+            <div>
+              <h2>${exam.title}</h2>
+              <p>${exam.subtitle}</p>
+              <div class="meta-line">${exam.questions.length} preguntas</div>
+              <div style="margin-top: 10px;">
+                ${exam.badges.map(b => `<span class="badge">${b}</span>`).join('')}
+              </div>
+            </div>
+            <div class="score-box" id="score-${exam.id}">
+              <div><strong>Resultado</strong></div>
+              <div class="big-score">Sin revisar</div>
+              <div class="meta-line">Contesta y luego presiona revisar.</div>
+            </div>
+          </div>
+
+          ${exam.questions.map((q, qIndex) => `
+            <div class="question" data-question="${qIndex}">
+              <div class="q-title">${qIndex + 1}. ${q.prompt}</div>
+              <div class="options">
+                ${q.options.map((opt, optIndex) => `
+                  <label class="option">
+                    <input type="radio" name="${exam.id}-q${qIndex}" value="${optIndex}" />
+                    <span>${opt.text}</span>
+                  </label>
+                `).join('')}
+              </div>
+              <div class="feedback" id="${exam.id}-feedback-${qIndex}"></div>
+            </div>
+          `).join('')}
+
+          <div class="actions">
+            <button class="action-btn primary" onclick="gradeExam('${exam.id}')">Revisar este examen</button>
+            <button class="action-btn success" onclick="resetExam('${exam.id}')">Reiniciar este examen</button>
+          </div>
+        </section>
+      `).join('');
+    }
+
+    function attachTabs() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.exam-panel').forEach(p => p.classList.remove('active'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.target).classList.add('active');
+        });
+      });
+    }
+
+    function gradeExam(examId) {
+      const exam = exams.find(e => e.id === examId);
+      const panel = document.getElementById(examId);
+      let score = 0;
+
+      panel.querySelectorAll('.question').forEach((qEl, qIndex) => {
+        const question = exam.questions[qIndex];
+        const selected = panel.querySelector(`input[name="${examId}-q${qIndex}"]:checked`);
+        const feedback = document.getElementById(`${examId}-feedback-${qIndex}`);
+        const correctIndex = question.options.findIndex(opt => opt.correct === true);
+
+        qEl.classList.remove('correct', 'incorrect');
+
+        if (selected && Number(selected.value) === correctIndex) {
+          score++;
+          qEl.classList.add('correct');
+          feedback.innerHTML = `<strong>Correcta.</strong> ${question.explanation}`;
+        } else if (selected) {
+          qEl.classList.add('incorrect');
+          feedback.innerHTML = `<strong>Incorrecta.</strong> ${question.explanation}`;
+        } else {
+          qEl.classList.add('incorrect');
+          feedback.innerHTML = `<strong>Sin respuesta.</strong> ${question.explanation}`;
+        }
+
+        feedback.classList.add('show');
+      });
+
+      const total = exam.questions.length;
+      const percent = Math.round((score / total) * 100);
+      const scoreBox = document.getElementById(`score-${examId}`);
+      scoreBox.innerHTML = `
+        <div><strong>Resultado</strong></div>
+        <div class="big-score">${score} / ${total}</div>
+        <div class="meta-line">${percent}% de aciertos</div>
+      `;
+    }
+
+    function resetExam(examId) {
+      const rebuilt = buildExamState();
+      const replacement = rebuilt.find(e => e.id === examId);
+      exams = exams.map(e => e.id === examId ? replacement : e);
+
+      renderExams();
+      attachTabs();
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.target === examId);
+      });
+      document.querySelectorAll('.exam-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === examId);
+      });
+    }
+
+    renderTabs();
+    renderExams();
+    attachTabs();
+  </script>
+</body>
+</html>
